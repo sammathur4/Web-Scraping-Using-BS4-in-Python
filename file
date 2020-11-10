@@ -1,0 +1,118 @@
+"""
+Web Scraping using BeautifulSoup
+Step0. Setting up the environment
+Step1. Get the html
+Step2. Parse the html
+Step3. Html tree transversal
+
+Setting up the environment. We will use requests module, html5lib and bs4 for web scraping.
+
+In order to work with html, we will have to get html as strings
+
+Once the html is fetched using requests, we need to parse it.
+For parsing we will use BeautifulSoup module which will create a tree like structure for our DOM
+
+Once HTML is fetched and parsed, the next step is to manipulate the tree using BS4 functions
+----------------------------------------------------------------------------------------------------------
+
+If you want to scrape a website
+1. Use the API
+2. HTML Scraping tool like BS4
+"""
+# Step 0:
+# pip install bs4
+# pip install requests
+# pip install html5lib
+
+
+import requests
+from bs4 import BeautifulSoup
+url = "https://www.codewithharry.com/"
+
+# Step1. Get the HTML
+r = requests.get(url)
+htmlContent = r.content
+print(htmlContent)
+
+
+# Step2. Parse the HTML
+soup = BeautifulSoup(htmlContent, 'html.parser')
+print(soup.prettify())
+
+# Step3. HTML tree traversal
+# Commonly used objects
+# 1. Tag print(type(title))
+# 2. NavigableString print(type(title.string))
+# 3. BeautifulSoup print(type(soup))
+# 4. Comment
+
+title = soup.title  # Get the title of the HTML page
+print(title)
+
+# Get all the paragraphs from the page
+paras = soup.find_all('p')
+print(paras)
+
+# Get all the anchors tags from the page
+anchors = soup.find_all('a')
+all_links = set()
+print(anchors)
+
+# Get first element in the HTML page
+print(soup.find('p'))
+
+# Get classes in any element in the HTML page
+print(soup.find('p')['class'])
+
+# Find all the elements with class lead
+print(soup.find_all('p', class_="lead"))
+
+# Get the text from the tags/soup
+print(soup.find('p').get_text())
+
+# Get all the links on the page
+for links in anchors:
+    if links.get('href') != '#':
+        link = "https://www.codewithharry.com/" + links.get('href')
+        all_links.add(link)
+        print(link)
+
+
+# Comment
+markup = "<p><!-- this is a comment --></p>"
+soup2 = BeautifulSoup(markup)
+print(soup2.p.string)
+print(type(soup2.p.string))
+
+navbarSupportedContent = soup.find(id='navbarSupportedContent')
+for elem in navbarSupportedContent.contents:
+    print("----------------")
+    print(elem)
+
+for elem in navbarSupportedContent.children:
+    print("----------------")
+    print(elem)
+
+# Difference between CHILDREN AND CONTENTS:
+"""
+.contents = a tag's children are present as a list. They are stored in memory
+.children = a tag's children are present as a generator. 
+They are not stored in memory, but are available for iteration 
+"""
+
+for item in navbarSupportedContent.stripped_strings:
+    print("----------------")
+    print(item)
+
+print(navbarSupportedContent.parent)
+print(navbarSupportedContent.parents)
+print("\n\n\n---------------------------------------------------------------------------------------------")
+for item in navbarSupportedContent.parents:
+    print("----------------")
+    print(item)
+    print(item.name)
+print(navbarSupportedContent.next_sibling.next_sibling)
+print(navbarSupportedContent.previous_sibling.previous_sibling)
+
+elem = soup.select('#loginModal')
+print(elem)
